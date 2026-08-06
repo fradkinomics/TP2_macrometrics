@@ -22,7 +22,7 @@
 #install.packages("here")
 
 #Si "seasonal" genera problemas:
-# install.packages("seasonal", repos="https://cloud.r-project.org")
+#install.packages("seasonal", repos="https://cloud.r-project.org")
 
 
 
@@ -325,9 +325,7 @@ cat("NAs por columna:\n"); print(colSums(is.na(datos_locales)))
 head(datos_locales)
 tail(datos_locales)
 
-# Guardar el panel local procesado
-write_csv(datos_locales, file.path(ruta_out, "panel_local.csv"))
-saveRDS(datos_locales, file.path(ruta_out, "panel_local.rds"))
+
 
 
 
@@ -426,32 +424,30 @@ cat("\nVariables del panel:\n"); print(names(datos))
 head(datos)
 tail(datos)
 
-# Guardar panel final
-write_csv(datos, file.path(ruta_out, "panel_final.csv"))
-saveRDS(datos,  file.path(ruta_out, "panel_final.rds"))
 
 
 
 #------------------------------------------------------------------------------#
-# 9. Conversión a objeto de serie de tiempo (ts) para el análisis
-#    El panel es mensual y arranca en octubre 2003 -> start = c(2003, 10).
-#    Guardamos la columna 'fecha' aparte y convertimos el resto a ts, que es
-#    el formato que requieren los paquetes de VAR / raíz unitaria.
+# 9. Objetos de serie de tiempo y guardado
+#    Guardamos el data.frame 'datos' (con fecha) y el mts 'datos_ts'.
+#    Las series ts individuales NO se guardan: se derivan al vuelo en el
+#    análisis con as.list(datos_ts), evitando duplicar la fuente de verdad.
 #------------------------------------------------------------------------------#
 
 datos_ts <- ts(
-  datos |> select(-fecha),
-  start = c(2003, 10),
+  datos |> dplyr::select(-fecha),
+  start     = c(2003, 10),   # panel arranca oct-2003
   frequency = 12
 )
 
 # Chequeos
-class(datos_ts)          # "mts" "ts" "matrix"
-start(datos_ts)          # 2003 10
-end(datos_ts)            # 2023  3
-frequency(datos_ts)      # 12
-colnames(datos_ts)       # las 9 variables
-head(datos_ts)
+stopifnot(identical(dim(datos_ts)[1], nrow(datos)))
+cat("datos_ts:", paste(start(datos_ts), collapse = "-"), "a",
+    paste(end(datos_ts), collapse = "-"),
+    "| vars:", paste(colnames(datos_ts), collapse = ", "), "\n")
 
-# Guardar también en formato ts
+# Guardado (una sola vez; el análisis lee de acá)
+saveRDS(datos,    file.path(ruta_out, "panel_final.rds"))
 saveRDS(datos_ts, file.path(ruta_out, "datos_ts.rds"))
+
+
