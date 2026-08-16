@@ -73,7 +73,7 @@ exp_inflacion <- read_excel(
   skip = 4,
   col_names = FALSE
 ) |>
-  select(
+  dplyr::select(
     fecha = 1,
     exp_inf_12m_orig = 10
   ) |>

@@ -517,7 +517,7 @@ p_panel <- ggplot(df_panel, aes(x = horizonte)) +
   facet_wrap(~ variable, nrow = 1, scales = "free_y") +
   labs(x = "Meses", y = "Respuesta acumulada (niveles)") +
   theme_bw(base_size = 11) +
-  theme(strip.background = element_rect(fill = "gray92"),
+  theme(strip.background = element_blank(),
         strip.text = element_text(face = "bold", size = 11),
         panel.grid.minor = element_blank())
 
@@ -547,6 +547,15 @@ p_erpt
 ggsave(here("output", "erpt_punto2.pdf"), p_erpt, width = 5, height = 3.6, units = "in")
 
 
+
+
+
+
+# ---- Guardado de objetos ----
+saveRDS(list(VAR = VAR, SVAR = SVAR, Y = Y, p = p, m = m,
+             Amat = Amat, Bmat = Bmat, H = H, H.ERPT = H.ERPT, gamma = gamma,
+             IRF.c.boot = IRF.c.boot, ERPT.boot = ERPT.boot, Y.boot = Y.boot),
+        here("data", "objetos_02.rds"))
 
 
 
